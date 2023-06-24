@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\ProjectSecond_RoomChatting.props" />
+</Project>

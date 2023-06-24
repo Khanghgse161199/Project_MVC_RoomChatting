@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from dreamschat.dreamguystech.com/template-html/template2/signup-email.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 16 Jun 2023 02:21:50 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dreams Chat - Html Template</title>
+
+    <link rel="icon" href="~/assets/img/favicon.png">
+
+    <link rel="stylesheet" href="~/assets/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/fontawesome.min.css">
+    <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
+
+    <link rel="stylesheet" href="~/assets/plugins/mcustomscroll/jquery.mCustomScrollbar.css">
+
+    <link rel="stylesheet" href="~/assets/css/app.css">
+</head>
+<body class="account-page">
+
+    <div class="main-wrapper">
+        @RenderBody()
+    </div>
+
+    <script src="~/assets/js/jquery-3.6.0.min.js"></script>
+    <script src="~/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/jquery.nicescroll.min.js"></script>
+    <script src="~/assets/plugins/mcustomscroll/jquery.mCustomScrollbar.js"></script>
+    <script src="~/assets/js/script.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+<!-- Mirrored from dreamschat.dreamguystech.com/template-html/template2/signup-email.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 16 Jun 2023 02:21:50 GMT -->
+</html>

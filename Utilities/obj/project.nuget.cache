@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "tzbcqh6b6DLxWFxzKNSaxveeZ9uJSIzt+zth2qoI8Ea6LUd5HFPNulaDV/4pmevfFQVUU6Fs0LQhK3xJ0HEftg==",
+  "success": true,
+  "projectFilePath": "E:\\Project Code\\Asp.net MVC\\RoomChatting\\Utilities\\Utilities.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\DELL\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}
