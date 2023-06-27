@@ -53,6 +53,9 @@ public partial class RoomChattingContext : DbContext
             entity.Property(e => e.Id).HasMaxLength(400);
             entity.Property(e => e.Admin).HasMaxLength(400);
             entity.Property(e => e.Creator).HasMaxLength(400);
+            entity.Property(e => e.LastMessage).HasMaxLength(700);
+            entity.Property(e => e.LastSenderMessage).HasMaxLength(200);
+            entity.Property(e => e.LastedUpdate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(400);
             entity.Property(e => e.Serect).HasMaxLength(100);
         });

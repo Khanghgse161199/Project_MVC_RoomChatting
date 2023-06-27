@@ -9,6 +9,6 @@ namespace DataServices.Repositories.ChatRoomUserMapping
 {
     public interface IRooUserMappingRepository : IRepository<DataServices.Entities.RoomUserMapping>
     {
-        void Udpate(DataServices.Entities.ChatRoom RoomUserMapping);
+        void Udpate(DataServices.Entities.RoomUserMapping RoomUserMapping);
     }
 }

@@ -18,6 +18,7 @@ namespace ViewModels.ChatRoom
         public string? ImgUrl { get; set; }
         public string Sender { get; set; }
         public string SenderName { get; set; }  
+        public bool IsMessageSystem { get; set; }
         public DateTime DateTime { get; set; }
 
     }

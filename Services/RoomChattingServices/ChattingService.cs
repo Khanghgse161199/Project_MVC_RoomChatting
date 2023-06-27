@@ -1,5 +1,6 @@
 ﻿using DataService.Repositories.UnitOfWork;
 using DataServices.Entities;
+using Microsoft.AspNetCore.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,11 @@ namespace Services.RoomChattingServices
     public interface IChattingService
     {
         Task<bool> CreateChatRoomAsync(CreateChatRoomViewModel info, string accId);
-        Task<List<ChatRoom>> GetAllAsync(string accId);
+        Task<List<ChatRecentViewModel>> GetAllAsync(string accId);
         Task<ChatDetailViewModel> GetChatDetailAsync(string chatRoomId, string accId);
         Task<bool> joinRoomAsync(string chatId, string accId, string? secrect);
+        Task<bool> UpdateCountNotify(string chatRoomId, string accId);
+        Task<bool> getOutRoomChatAsync(string idRoom, string accId);
     }
     public class ChattingService: IChattingService
     {
@@ -28,7 +31,7 @@ namespace Services.RoomChattingServices
             var chatRoom = await _uow.ChatRoom.FirstOfDefaultAsync(p => p.Id == chatId);
            if (chatRoom != null)
             {
-                var mappingExist = await _uow.RoomMapping.FirstOfDefaultAsync(p => p.AccId == accId && p.ChatRoomId == chatId);
+                var mappingExist = await _uow.RoomMapping.FirstOfDefaultAsync(p => p.AccId == accId && p.ChatRoomId == chatId && p.IsActive);
                 if (mappingExist == null)
                 {
                     if (chatRoom.IsPrivate)
@@ -40,7 +43,8 @@ namespace Services.RoomChattingServices
                                 AccId = accId,
                                 ChatRoomId = chatId,
                                 Id = Guid.NewGuid().ToString(),
-                                IsActive = true
+                                IsActive = true,
+                                CountNotify = 0,
                             };
 
                             await _uow.RoomMapping.AddAsync(roomUserMapping);
@@ -101,7 +105,8 @@ namespace Services.RoomChattingServices
                                 DateTime = item.CreatedDate,
                                 Sender = item.Sender,
                                 SenderName = acc.Email,
-                                Messaget = item.Message1                               
+                                Messaget = item.Message1,
+                                IsMessageSystem = item.IsMessageSystem,
                             };
 
                             if (!string.IsNullOrEmpty(item.ImgSetId)){
@@ -119,15 +124,43 @@ namespace Services.RoomChattingServices
             else return null;
         }
 
-        public async Task<List<ChatRoom>> GetAllAsync(string accId)
+        public async Task<List<ChatRecentViewModel>> GetAllAsync(string accId)
         {
-            var currentRoomMapping = await _uow.RoomMapping.GetAllAsync(p => p.AccId == accId && p.IsActive,null,"ChatRoom");
-            if (currentRoomMapping != null)
+            var currentRoomMapping = await _uow.RoomMapping.GetAllAsync(p => p.AccId == accId && p.IsActive,null, "ChatRoom,ChatRoom.Messages");
+            var newCurrentRoomMapping = currentRoomMapping.AsQueryable();
+            var listSort = newCurrentRoomMapping.OrderByDescending(p => p.ChatRoom.LastedUpdate);
+            if (currentRoomMapping != null && currentRoomMapping.Count > 0)
             {
-                List<ChatRoom> tmp = new List<ChatRoom>();
-                foreach (var room in currentRoomMapping)
+                List<ChatRecentViewModel> tmp = new List<ChatRecentViewModel>();
+                foreach (var room in listSort)
                 {
-                    tmp.Add(room.ChatRoom);
+                    if(room != null && room.ChatRoom != null)
+                    {
+                        if(room.ChatRoom.Messages != null && room.ChatRoom.Messages.Count > 0)
+                        {
+                            tmp.Add(new ChatRecentViewModel
+                            {
+                                Id = room.ChatRoom.Id,
+                                Name = room.ChatRoom.Name,
+                                CountNotify = room.CountNotify,
+                                TimeSend = room.ChatRoom.LastedUpdate,
+                                LastMessage = room.ChatRoom.LastMessage,
+                                SenderLastMessage = room.ChatRoom.LastSenderMessage,
+                            });
+                        }
+                        else
+                        {
+                            tmp.Add(new ChatRecentViewModel
+                            {
+                                Id = room.ChatRoom.Id,
+                                Name = room.ChatRoom.Name,
+                                CountNotify = room.CountNotify,
+                                TimeSend = default(DateTime),
+                                LastMessage = null,
+                                SenderLastMessage = null,
+                            });
+                        }
+                    }
                 }
                 return tmp;
             }
@@ -144,18 +177,73 @@ namespace Services.RoomChattingServices
                 Admin = accId,
                 IsActive = true,
                 IsPrivate = info.IsPrivate,
-                Serect = info.serectKey
+                Serect = info.serectKey,
+                LastedUpdate = DateTime.Now,
             };
             await _uow.ChatRoom.AddAsync(newChatRoom);
+            await _uow.SaveAsync();
             RoomUserMapping roomUserMapping = new RoomUserMapping() {
                 Id = Guid.NewGuid().ToString(),
                 AccId = accId,
                 ChatRoomId = chatRoomId,
-                IsActive = true
+                IsActive = true,
+                CountNotify = 0,
             };
             await _uow.RoomMapping.AddAsync(roomUserMapping);
             await _uow.SaveAsync();
             return true;
+        }
+
+        public async Task<bool> UpdateCountNotify(string chatRoomId, string accId)
+        {
+            if (!string.IsNullOrEmpty(chatRoomId) && !string.IsNullOrEmpty(accId))
+            {
+                var currentRoomMapping = await _uow.RoomMapping.FirstOfDefaultAsync(p => p.AccId == accId && p.ChatRoomId == chatRoomId && p.IsActive);
+                if (currentRoomMapping != null)
+                {
+                    currentRoomMapping.CountNotify = 0;
+                    _uow.RoomMapping.Udpate(currentRoomMapping);
+                    await _uow.SaveAsync();
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public async Task<bool> getOutRoomChatAsync(string idRoom, string accId)
+        {
+            if (!string.IsNullOrEmpty(idRoom) && !string.IsNullOrEmpty(accId))
+            {
+                var currentRoomChat = await _uow.ChatRoom.FirstOfDefaultAsync(p => p.Id == idRoom && p.IsActive && p.Admin != null, "RoomUserMappings");
+                if (currentRoomChat.RoomUserMappings != null && currentRoomChat.RoomUserMappings.Count > 0)
+                {
+                    var currentUser = await _uow.Users.FirstOfDefaultAsync(p => p.AccId == accId, "Acc,Acc.RoomUserMappings");
+                    if (currentUser != null && currentUser.Acc.RoomUserMappings.Count > 0)
+                    {
+                        var currentRoomMapping = currentUser.Acc.RoomUserMappings.Where(p => p.AccId == accId && p.ChatRoomId == idRoom && p.IsActive).FirstOrDefault();
+                        currentRoomMapping.IsActive = false;
+                       
+                        _uow.RoomMapping.Udpate(currentRoomMapping);
+                        var newMessage = new Message()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            ChatRoomId = idRoom,
+                            Message1 = currentUser.Fullname + " " + "has left the chat room 💁‍→",
+                            CreatedDate = DateTime.Now,
+                            Sender = currentUser.AccId,
+                            ImgSetId = null,
+                            IsMessageSystem = true
+                        };
+                        await _uow.messageRepository.AddAsync(newMessage);
+                        await _uow.SaveAsync();
+                        return true;
+                    }
+                    else return false;
+                }
+                else return false;
+            }
+            else return false;
         }
     }
 }

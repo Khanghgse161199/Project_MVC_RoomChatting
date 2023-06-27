@@ -818,7 +818,6 @@ E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\ne
 E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.AssemblyInfoInputs.cache
 E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.AssemblyInfo.cs
 E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.csproj.CoreCompileInputs.cache
-E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.MvcApplicationPartsAssemblyInfo.cs
 E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.MvcApplicationPartsAssemblyInfo.cache
 E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.RazorAssemblyInfo.cache
 E:\Project Code\Asp.net MVC\RoomChatting\ProjectSecond_RoomChatting\obj\Debug\net7.0\ProjectSecond_RoomChatting.RazorAssemblyInfo.cs

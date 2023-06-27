@@ -14,7 +14,7 @@ namespace ViewModels.Home
     {
         public ProfileViewModel ProfileViewModel { get; set; }
         public CreateChatRoomViewModel? CreateChatRoomViewModel { get; set; }
-        public List<DataServices.Entities.ChatRoom> chatRooms { get; set; }
+        public List<ChatRecentViewModel>? chatRooms { get; set; }
         public ChatDetailViewModel ChatDetailViewModel { get; set; }
         public CreateMessageViewModel CreateMessageViewModel { get; set; }
         public JoinChatViewModel JoinChatViewModel { get; set; }

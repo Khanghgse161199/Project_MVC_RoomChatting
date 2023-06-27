@@ -29,8 +29,8 @@ namespace ProjectSecond_RoomChatting.Controllers
                 {
                     var joined = await _ChattingService.joinRoomAsync(joinchatViewModel.chatId, checkToken.accId, joinchatViewModel.secrect);
                         if (joined)
-                        {
-                            return RedirectToAction("Index", "Home", new { success = "Join success" });
+                        {                
+                        return RedirectToAction("Index", "Home", new { success = "Join success" });
                         }
                         else
                         {
@@ -44,6 +44,32 @@ namespace ProjectSecond_RoomChatting.Controllers
 
             }
       
+        public async Task<IActionResult> UserGetOutRoom(string idRoom)
+        {
+            if (!string.IsNullOrEmpty(idRoom))
+            {
+                var session = HttpContext.Session;
+                string token = session.GetString("TOKEN");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    var checkToken = await _Auth.checkTokenAsyc(token);
+                    if (checkToken != null)
+                    {
+                        var isGetOut = await _ChattingService.getOutRoomChatAsync(idRoom, checkToken.accId);
+                        if (isGetOut)
+                        {
+                            ViewBag.CurrentChat = null;
+                            return RedirectToAction("Index","Home", new { success = "get out success!" });
+                        }
+                        else return RedirectToAction("Index","Home", new { error = "error when get out this room!" });
+                    }
+                    else return RedirectToAction("Login", "Auth", new { error = "Login first!" });
+                }
+                else return RedirectToAction("Login","Auth", new { error = "Login first!" });
+            }
+            else return RedirectToAction("Index","Home", new { error = "error when get id this room!" });
+        }
+
         public async Task<IActionResult> Index()
         {
             return View();

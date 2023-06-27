@@ -6,13 +6,21 @@
     ViewBag.avatar = Model.ProfileViewModel.ImgUrl;
 }
 @model IndexHomeVIewModel
+<style>
+    #messages{
+        max-height: 100%;
+        overflow: scroll;
+    }
+    #messages::-webkit-scrollbar {
+        display: none;
+    }
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css" integrity="sha512-DIW4FkYTOxjCqRt7oS9BFO+nVOwDL4bzukDyDtMO7crjUZhwpyrWBFroq+IqRe6VnJkTpRAS6nhDvf0w+wHmxg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <input type="hidden" id="inputEmailTmp" value="@Model.ProfileViewModel.Email"/>
 <div class="sidebar-group left-sidebar chat_sidebar">
 
     <div id="chats" class="left-sidebar-wrap sidebar active slimscroll">
-        <div class="slimscroll">
-
+        <div class="slimscroll">        
             <div class="left-chat-title d-flex justify-content-between align-items-center">
                 <div class="chat-title">
                 </div>
@@ -24,8 +32,8 @@
                             </a>
                         </li>
                        @* <li><a href="group.html"><span class="material-icons">group</span></a></li>*@
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#add-user"><i class="fas fa-plus"></i></a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#join"><i class="fas fa-users"></i></a></li>
+                        <li title="Create Room"><a href="#" data-bs-toggle="modal" data-bs-target="#add-user"><i class="fas fa-plus"></i></a></li>
+                        <li title="Join Room"><a href="#" data-bs-toggle="modal" data-bs-target="#join"><i class="fas fa-users"></i></a></li>
 
                     </ul>
                 </div>
@@ -38,12 +46,12 @@
                         <h4>Recent Chats</h4>
                     </div>
                     <div class="add-section">
-                        <a href="#"><i class="fas fa-edit"></i></a>
+                       @* <a href="#"><i class="fas fa-edit"></i></a>*@
                     </div>
                 </div>
 
                 <ul class="user-list mt-2">
-                    @if(Model.chatRooms.Count > 0)
+                    @if (Model.chatRooms != null && Model.chatRooms.Count > 0)
                     {
                         foreach (var item in Model.chatRooms)
                         {
@@ -52,13 +60,36 @@
                                 <div class="users-list-body">
                                     <div>
                                         <h5>@item.Name</h5>
-                                        <p>It seems logical that the</p>
+                                            @if(item.SenderLastMessage != null){
+                                                @if (Model.ProfileViewModel.Fullname == @item.SenderLastMessage)
+                                                {
+                                                    <p>You: @item.LastMessage</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>@item.SenderLastMessage : @item.LastMessage</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="last-chat-time" id="divNotificateCount @item.Id">
+                                            @if(item.TimeSend != null && item.TimeSend != default(DateTime)){
+                                                @if (item.TimeSend.Date == DateTime.Now.Date && item.TimeSend.Month == DateTime.Now.Month)
+                                                {
+                                                    <small class="text-muted">@item.TimeSend.ToString("hh:mm")</small>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-muted">@item.TimeSend.ToString("dd-MM hh:mm")</small>
+                                                }
+                                            }
+                                            
+                                            @if (item.CountNotify > 0)
+                                            {
+                                                <div class="new-message-count">@item.CountNotify</div>
+                                            }                                       
+                                        </div>
+                                       
                                     </div>
-                                    <div class="last-chat-time">
-                                        <small class="text-muted">05 min</small>
-                                        <div class="new-message-count">1</div>
-                                    </div>
-                                </div>
                                 </a>
                             </li>
                         }
@@ -212,8 +243,8 @@
 
 @if(Model.ChatDetailViewModel != null)
 {
-    <div class="chat" id="middle">
-        <div class="slimscroll">
+    <div class="chat" id="middle" style="display: flex;flex-direction: column;">
+       
             <div class="chat-header">
                 <div class="user-details">
                     <div class="d-lg-none ms-2">
@@ -249,10 +280,10 @@
                     </li>*@
                           <li class="list-inline-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Search">
                     <a  class="btn btn-outline-light chat-search-btn">
-                    <i class="fas fa-search"></i>
+                            <i class="fas fa-share"></i>
                     </a>
                     </li>
-                        <li class="list-inline-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Voice call">
+                       @* <li class="list-inline-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Voice call">
                             <a href="javascript:void(0)" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#voice_call">
                                 <i class="fas fa-phone-alt voice_chat_phone"></i>
                             </a>
@@ -261,39 +292,77 @@
                             <a href="javascript:void(0)" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#video_call">
                                 <i class="fas fa-video"></i>
                             </a>
-                        </li>
+                        </li>*@
 
                         <li class="list-inline-item">
                             <a class="btn btn-outline-light no-bg" href="#" data-bs-toggle="dropdown">
                                 <i class="fas fa-ellipsis-h"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#" class="dropdown-item dream_profile_menu">Archive <span><i class="fas fa-archive"></i></span></a>
-                                <a href="#" class="dropdown-item">Muted <span class="material-icons">volume_off</span></a>
-                                <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
+                               @* <a href="#" class="dropdown-item dream_profile_menu">Archive <span><i class="fas fa-archive"></i></span></a>
+                                <a href="#" class="dropdown-item">Muted <span class="material-icons">volume_off</span></a>*@
+                            <a id="getOutTag" onclick="GetOutRoom('@Model.ProfileViewModel.AccId.ToString()')" class="dropdown-item">Get Out <span><i class="fas fa-sign-out-alt"></i></span></a>
+                            <a href="#"class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
                             </div>
                         </li>
                     </ul>
                 </div>
 
-                <div class="chat-search">
+                <div class="chat-search" style="z-index: 2030">
                     <form>
-                        <span class="fas fa-search form-control-feedback"></span>
+                       @* <span class="fas fa-search form-control-feedback"></span>*@
                         <input type="text" name="chat-search" placeholder="Search Chats" id="currentIdRoom" value="@ViewBag.CurrentChat" class="form-control">
                         <div class="close-btn-chat"><span class="material-icons">close</span></div>
                     </form>
                 </div>
-
             </div>
-            <div class="chat-body">
-                <div id="messages" class="messages">
+        <div id="messages" style="padding:0; margin:0;">
+            <div class="chat-body" >
+                <div id="messagess" class="messages">
                     @if(Model.ChatDetailViewModel.messages != null && Model.ChatDetailViewModel.messages.Count > 0)
-                    {
-                       foreach (var item in Model.ChatDetailViewModel.messages)
+                    {                 
+                        foreach (var item in Model.ChatDetailViewModel.messages)
                         {
-                            if(item.Sender == ViewBag.sender)
+                            if (item.IsMessageSystem)
                             {
-                                <div class="chats chats-right">
+                                if(item.Sender == ViewBag.sender)
+                                {
+                                    <div>
+                                        <div style="width: 345px;text-align: center;border-radius: 14px;background-color: darkgreen;color:white;box-shadow: 0 0 20px rgba(222, 222, 232, 0.6);">
+                                            <div>
+                                                <div>
+                                                    <div>
+                                                        <div>
+                                                            <div class="time"><p style="padding: 2px;"> @item.DateTime.ToString("dd/MM/yy - hh:mm") - You has left chat room</p></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <div style="width: 345px;text-align: center;border-radius: 14px;background-color: darkred;color:white;box-shadow: 0 0 20px rgba(222, 222, 232, 0.6);">
+                                            <div>
+                                                <div>
+                                                    <div>
+                                                        <div>
+                                                            <div class="time"><p style="padding: 2px;"> @item.DateTime.ToString("dd/MM/yy - hh:mm") - @item.SenderName has left chat room</p></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                }
+                            }
+                            else if (item.Sender == ViewBag.sender)
+                            {
+                                <div id="@item.Id" class="chats chats-right">
                                     <div class="chat-content">
                                         <div class="message-content">
                                             @item.Messaget
@@ -316,10 +385,9 @@
                                                 <i class="fas fa-ellipsis-h"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                                <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                                <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                                <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
+                                                <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>                         
+                                                <a class="dropdown-item" id="taga @item.Id" onclick="DeleteMessage('@item.Id.ToString()')">Delete <span><i class="far fa-trash-alt"></i></span></a>
+
                                             </div>
                                         </div>
                                         <div class="chat-read-col">
@@ -327,8 +395,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            }else{
-                                <div class="chats">
+                            } else {
+                                <div id="@item.Id" class="chats">
                                     <div class="chat-avatar">
                                         <img src="assets/img/avatar/avatar-8.jpg" class="rounded-circle dreams_chat" alt="image">
                                     </div>
@@ -351,10 +419,8 @@
                                                 <i class="fas fa-ellipsis-h"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                                <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                                <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                                <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
+                                                <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>   
+
                                             </div>
                                         </div>
                                     </div>
@@ -363,16 +429,16 @@
                         }
                     }
                 </div>
-            </div>
+            </div>        
         </div>
-        <div class="chat-footer">
-            <form id="FormchatAsync" asp-action="CreateMessage" asp-controller="Message" method="post">
+        <div class="chat-footer" style="z-index:2030">
+            <form id="FormchatAsync" asp-action="CreateMessage" asp-controller="Message" method="post" style=" align-self: flex-end;">
                 <div class="smile-col">
-                    <a href="#"><i class="far fa-smile"></i></a>
+                    <a ><i class="fas fa-pencil-alt"></i></a>
                 </div>
-                <div class="attach-col">
+                @*<div class="attach-col">
                     <a href="#"><i class="fas fa-paperclip"></i></a>
-                </div>
+                </div>*@
                 <input type="hidden" id="idChatRoom" name="CreateMessageViewModel.chatId" value="@ViewBag.CurrentChat">
                 <input id="chatMessage" type="text" asp-for="CreateMessageViewModel.Message" class="form-control chat_form" placeholder="Enter Message.....">
                 <div class="form-buttons">
@@ -380,9 +446,9 @@
                         <span class="material-icons">send</span>
                     </button>
                 </div>
-                <div class="specker-col">
+               @* <div class="specker-col">
                     <a href="#"><span class="material-icons">settings_voice</span></a>
-                </div>
+                </div>*@
             </form>
         </div>
     </div>
@@ -390,314 +456,12 @@
 else
 {
     <div class="chat" id="middle">
-        <div class="slimscroll">
-            <div class="chat-header">
-                <div class="user-details">
-                    <div class="d-lg-none ms-2">
-                        <ul class="list-inline mt-2 me-2">
-                            <li class="list-inline-item">
-                                <a class="text-muted px-0 left_side" href="#" data-chat="open">
-                                    <i class="fas fa-arrow-left"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <figure class="avatar ms-1">
-                        <img src="assets/img/avatar/avatar-8.jpg" class="rounded-circle" alt="image">
-                    </figure>
-                    <div class="mt-1">
-                        <h5>hello</h5>
-                        <small class="online">Hi</small>      
-                    </div>
-                </div>
-                <div class="chat-options">
-                    <ul class="list-inline">
-                          <li class="list-inline-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Search">
-                    <a href="javascript:void(0)" class="btn btn-outline-light chat-search-btn">
-                    <i class="fas fa-search"></i>
-                    </a>
-                    </li>
-                        <li class="list-inline-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Voice call">
-                            <a href="javascript:void(0)" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#voice_call">
-                                <i class="fas fa-phone-alt voice_chat_phone"></i>
-                            </a>
-                        </li>
-                        <li class="list-inline-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Video call">
-                            <a href="javascript:void(0)" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#video_call">
-                                <i class="fas fa-video"></i>
-                            </a>
-                        </li>
-
-                        <li class="list-inline-item">
-                            <a class="btn btn-outline-light no-bg" href="#" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#" class="dropdown-item dream_profile_menu">Archive <span><i class="fas fa-archive"></i></span></a>
-                                <a href="#" class="dropdown-item">Muted <span class="material-icons">volume_off</span></a>
-                                <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="chat-search">
-                    <form>
-                        <span class="fas fa-search form-control-feedback"></span>
-                        <input type="text" value="@ViewBag.CurrentChat" placeholder="Search Chats" class="form-control">
-                        <div class="close-btn-chat"><span class="material-icons">close</span></div>
-                    </form>
-                </div>
-
-            </div>
+        <div class="slimscroll">        
             <div class="chat-body">
-                <div class="messages">
-                    <div class="chats">
-                        <div class="chat-avatar">
-                            <img src="assets/img/avatar/avatar-8.jpg" class="rounded-circle dreams_chat" alt="image">
-                        </div>
-                        <div class="chat-content">
-                            <div class="message-content">
-                                Hi James! What’s Up?
-                                <div class="chat-time">
-                                    <div>
-                                        <div class="time"><i class="fas fa-clock"></i> 10:00</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-profile-name">
-                                <h6>Doris Brown</h6>
-                            </div>
-                        </div>
-                        <div class="chat-action-btns ms-3">
-                            <div class="chat-action-col">
-                                <a class="#" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                    <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                    <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                    <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chats chats-right">
-                        <div class="chat-content">
-                            <div class="message-content">
-                                Good morning, How are you? What about our next meeting?
-                                <div class="chat-time">
-                                    <div>
-                                        <div class="time"><i class="fas fa-clock"></i> 10:00</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-profile-name text-end">
-                                <h6>Alexandr</h6>
-                            </div>
-                        </div>
-                        <div class="chat-avatar">
-                            <img src="assets/img/avatar/avatar-12.jpg" class="rounded-circle dreams_chat" alt="image">
-                        </div>
-                        <div class="chat-action-btns me-2">
-                            <div class="chat-action-col">
-                                <a class="#" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                    <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                    <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                    <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                                </div>
-                            </div>
-                            <div class="chat-read-col">
-                                <span class="material-icons">done_all</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chats">
-                        <div class="chat-avatar">
-                            <img src="assets/img/avatar/avatar-8.jpg" class="rounded-circle dreams_chat" alt="image">
-                        </div>
-                        <div class="chat-content">
-                            <div class="message-content">
-                                & Next meeting tomorrow 10.00AM
-                                <div class="chat-time">
-                                    <div>
-                                        <div class="time"><i class="fas fa-clock"></i> 10:06</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-profile-name">
-                                <h6>Doris Brown</h6>
-                            </div>
-                        </div>
-                        <div class="chat-action-btns ms-3">
-                            <div class="chat-action-col">
-                                <a class="#" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                    <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                    <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                    <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat-line">
-                        <span class="chat-date">Today</span>
-                    </div>
-                    <div class="chats chats-right">
-                        <div class="chat-content">
-                            <div class="message-content">
-                                Wow Thats Great
-                                <div class="chat-time">
-                                    <div>
-                                        <div class="time"><i class="fas fa-clock"></i> 10:02</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-profile-name text-end">
-                                <h6>Alexandr</h6>
-                            </div>
-                        </div>
-                        <div class="chat-avatar">
-                            <img src="assets/img/avatar/avatar-12.jpg" class="rounded-circle dreams_chat" alt="image">
-                        </div>
-                        <div class="chat-action-btns me-2">
-                            <div class="chat-action-col">
-                                <a class="#" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                    <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                    <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                    <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                                </div>
-                            </div>
-                            <div class="chat-read-col">
-                                <span class="material-icons">done_all</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chats">
-                        <div class="chat-avatar">
-                            <img src="assets/img/avatar/avatar-8.jpg" class="rounded-circle dreams_chat" alt="image">
-                        </div>
-                        <div class="chat-content">
-                            <div class="message-content">
-                                <div class="download-col">
-                                    <ul>
-                                        <li>
-                                            <div class="image-download-col">
-                                                <a href="assets/img/chat-download.jpg" data-fancybox="gallery" class="fancybox">
-                                                    <img src="assets/img/chat-download.jpg" alt>
-                                                </a>
-                                                <div class="download-action d-flex align-items-center">
-                                                    <div><a href="#"><i class="fas fa-cloud-download-alt"></i></a></div>
-                                                    <div><a href="#"><i class="fas fa-ellipsis-h"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="image-download-col image-not-download">
-                                                <a href="assets/img/chat-download.jpg" data-fancybox="gallery" class="fancybox">
-                                                    <img src="assets/img/chat-download.jpg" alt>
-                                                </a>
-                                                <div class="download-action d-flex align-items-center">
-                                                    <div><a href="#"><i class="fas fa-cloud-download-alt"></i></a></div>
-                                                    <div><a href="#"><i class="fas fa-ellipsis-h"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="image-download-col image-not-download">
-                                                <a href="assets/img/chat-download.jpg" data-fancybox="gallery" class="fancybox">
-                                                    <img src="assets/img/chat-download.jpg" alt>
-                                                </a>
-                                                <div class="download-action d-flex align-items-center">
-                                                    <div><a href="#"><i class="fas fa-cloud-download-alt"></i></a></div>
-                                                    <div><a href="#"><i class="fas fa-ellipsis-h"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="chat-time">
-                                    <div>
-                                        <div class="time"><i class="fas fa-clock"></i> 10:00</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-profile-name">
-                                <h6>Doris Brown</h6>
-                            </div>
-                        </div>
-                        <div class="chat-action-btns ms-3">
-                            <div class="chat-action-col">
-                                <a class="#" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                    <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                    <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                    <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chats chats-right">
-                        <div class="chat-content">
-                            <div class="message-content">
-                                <div class="file-download d-flex align-items-center">
-                                    <div class="file-type d-flex align-items-center justify-content-center me-2">
-                                        <i class="far fa-file-archive"></i>
-                                    </div>
-                                    <div class="file-details">
-                                        <span class="file-name">filename.zip</span>
-                                        <span class="file-size">10.6MB</span>
-                                    </div>
-                                    <div class="download-action d-flex align-items-center">
-                                        <div><a href="#"><i class="fas fa-cloud-download-alt"></i></a></div>
-                                        <div><a href="#"><i class="fas fa-ellipsis-h"></i></a></div>
-                                    </div>
-                                </div>
-                                <div class="chat-time">
-                                    <div>
-                                        <div class="time"><i class="fas fa-clock"></i> 10:02</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-profile-name text-end">
-                                <h6>Alexandr</h6>
-                            </div>
-                        </div>
-                        <div class="chat-avatar">
-                            <img src="assets/img/avatar/avatar-12.jpg" class="rounded-circle dreams_chat" alt="image">
-                        </div>
-                        <div class="chat-action-btns me-2">
-                            <div class="chat-action-col">
-                                <a class="#" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item dream_profile_menu">Copy <span><i class="far fa-copy"></i></span></a>
-                                    <a href="#" class="dropdown-item">Save <span class="material-icons">save</span></a>
-                                    <a href="#" class="dropdown-item">Forward <span><i class="fas fa-share"></i></span></a>
-                                    <a href="#" class="dropdown-item">Delete <span><i class="far fa-trash-alt"></i></span></a>
-                                </div>
-                            </div>
-                            <div class="chat-read-col">
-                                <span class="material-icons">done_all</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="chat-title">
+                    <h2>
+                        Choose Room Chatting...
+                    </h2>
                 </div>
             </div>
         </div>
@@ -1266,6 +1030,12 @@ else
     }
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
     <script>
+        //const elements = document.querySelectorAll('.last-chat-time');
+        //elements.forEach(element => {
+        //    element.style.display = 'none';
+        //});
+        var myDiv = document.getElementById("messages");
+        myDiv.scrollTop = myDiv.scrollHeight;
         var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
         var accId = '@Model.ProfileViewModel.AccId';
         var currentRoom = document.getElementById("idChatRoom").value;
@@ -1274,12 +1044,23 @@ else
             console.log("connected");
         });
         connection.on("ReciveMessage", function (message, email, currentChat, createDate) {
-            if (currentChat == currentRoom) {
-                console.log("test");
-                document.getElementById("messages").innerHTML += "<div class='chats'><div class='chat-avatar'><img src='assets/img/avatar/avatar-8.jpg' class='rounded-circle dreams_chat' alt='image'></div><div class='chat-content'><div class='message-content'>" + message + "<div class='chat-time'><div><div class='time'><i class='fas fa-clock'></i>" + createDate + "</div></div></div></div><div class='chat-profile-name'><h6>" + email + "</h6></div> </div><div class='chat-action-btns ms-3'> <div class='chat-action-col'><a class='#' href='#' data-bs-toggle='dropdown'><i class='fas fa-ellipsis-h'></i></a><div class='dropdown-menu dropdown-menu-end'><a href='#' class='dropdown-item dream_profile_menu'>Copy <span><i class='far fa-copy'></i></span></a><a href='#' class='dropdown-item'>Save <span class='material-icons'>save</span></a> <a href='#' class='dropdown-item'>Forward <span><i class='fas fa-share'></i></span></a><a href='#' class='dropdown-item'>Delete <span><i class='far fa-trash-alt'></i></span></a></div></div></div></div>";
+            if (currentChat != currentRoom) {
+                console.log("tes1");
+                document.getElementById("messagess").innerHTML += "<div class='chats'><div class='chat-avatar'><img src='assets/img/avatar/avatar-8.jpg' class='rounded-circle dreams_chat' alt='image'></div><div class='chat-content'><div class='message-content'>" + message + " 💁‍→ <div class='chat-time'><div><div class='time'><i class='fas fa-clock'></i>" + createDate + "</div></div></div></div><div class='chat-profile-name'><h6>" + email + "</h6></div> </div><div class='chat-action-btns ms-3'> <div class='chat-action-col'><a class='#' href='#' data-bs-toggle='dropdown'><i class='fas fa-ellipsis-h'></i></a><div class='dropdown-menu dropdown-menu-end'><a href='#' class='dropdown-item dream_profile_menu'>Copy <span><i class='far fa-copy'></i></span></a><a href='#' class='dropdown-item'>Save <span class='material-icons'>save</span></a> <a href='#' class='dropdown-item'>Forward <span><i class='fas fa-share'></i></span></a><a href='#' class='dropdown-item'>Delete <span><i class='far fa-trash-alt'></i></span></a></div></div></div></div>";
+                location.reload();
+             }else{
+                location.reload();
              }
+            
         });
-
+        connection.on("DeleteMessage", function (idMessage) {      
+                console.log("test2");
+            document.getElementById(idMessage).innerHTML = "";        
+        });
+        connection.on("MemberGetOut", function (fullname, timeOut) {
+            console.log("test3");
+            document.getElementById("messagess").innerHTML += " <div><div style='width: 345px;text-align: center;border-radius: 14px;background-color: darkred;color:white;box-shadow: 0 0 20px rgba(222, 222, 232, 0.6);'><div > <div><div><div ><div class='time'><p style='padding: 2px;'>" + timeOut + "- " + fullname + " has left chat room</p></div></div> </div></div></div></div></div><br>"
+        });
       async function SendMessage() {
             console.log('sended');
             var email = document.getElementById("inputEmailTmp").value;
@@ -1288,10 +1069,31 @@ else
             var dateCurrent = new Date();
             var createDate = dateCurrent;
             var idRoom = document.getElementById("idChatRoom").value;
-            connection.invoke("SendAll", message, email, currentChat, createDate);
-
+            await connection.invoke("SendAll", message, email, currentChat, createDate);
             var form = document.getElementById("FormchatAsync");
             form.submit();
+        }
+        async function DeleteMessage(idMessage) {
+            var currentChat = document.getElementById("currentIdRoom").value;
+            await connection.invoke("DeleteAll", currentRoom, idMessage);
+            var idTag = "taga " + idMessage;
+            var myLink = document.getElementById(idTag);
+            myLink.href = "/Message/DeleteMessage?messageId=" + idMessage + "&currentChatRoom=" + currentChat;
+            myLink.addEventListener("click", function (event) {
+                event.preventDefault(); 
+                window.location.href = myLink.href;
+            });
+        }
+
+        async function GetOutRoom(accId) {
+            var currentChat = document.getElementById("currentIdRoom").value;
+            await connection.invoke("GetOutRoom", currentChat, accId);
+            var myLink = document.getElementById("getOutTag");
+            myLink.href = "/Chat/UserGetOutRoom?idRoom=" + currentChat;
+            myLink.addEventListener("click", function (event) {
+                event.preventDefault();
+                window.location.href = myLink.href;
+            });
         }
     </script>
 }

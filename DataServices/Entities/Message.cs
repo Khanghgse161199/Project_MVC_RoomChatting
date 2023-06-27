@@ -17,6 +17,8 @@ public partial class Message
 
     public string Sender { get; set; } = null!;
 
+    public bool IsMessageSystem { get; set; }
+
     public virtual ChatRoom ChatRoom { get; set; } = null!;
 
     public virtual ImgSet? ImgSet { get; set; }

@@ -54,6 +54,10 @@ namespace ProjectSecond_RoomChatting.Controllers
                 var checkToken = await _authService.checkTokenAsyc(token);
                 if (checkToken != null)
                 {
+                    if (!string.IsNullOrEmpty(chatid))
+                    {
+                        var isUpdateCountNotify = await _chattingService.UpdateCountNotify(chatid, checkToken.accId);
+                    }
                     var profile = await _userService.GetProfileAsync(checkToken.accId);
                     IndexHomeVIewModel indexHomeVIewModel = new IndexHomeVIewModel() {
                         ProfileViewModel = profile,

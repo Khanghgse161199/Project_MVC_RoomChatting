@@ -23,8 +23,8 @@ namespace Services.RedisServices
         {
             //chứa các tùy chọn để định cấu hình mục trong _Cache.
             var options = new DistributedCacheEntryOptions()
-            .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
-            .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+            .SetAbsoluteExpiration(DateTime.Now.AddMinutes(15))
+            .SetSlidingExpiration(TimeSpan.FromMinutes(10));
             var typeBytes = Encoding.UTF8.GetBytes(connectId);
             //ghi dữ liệu vào cache
             await _Cache.SetAsync(accId, typeBytes, options);

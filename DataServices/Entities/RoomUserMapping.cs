@@ -13,6 +13,8 @@ public partial class RoomUserMapping
 
     public bool IsActive { get; set; }
 
+    public int CountNotify { get; set; }
+
     public virtual Account Acc { get; set; } = null!;
 
     public virtual ChatRoom ChatRoom { get; set; } = null!;

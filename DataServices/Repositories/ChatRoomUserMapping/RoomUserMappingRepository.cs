@@ -15,7 +15,7 @@ namespace DataServices.Repositories.ChatRoomUserMapping
         {
             _context = context;
         }
-        public void Udpate(Entities.ChatRoom RoomUserMapping)
+        public void Udpate(Entities.RoomUserMapping RoomUserMapping)
         {
             _context.Update(RoomUserMapping);
         }
